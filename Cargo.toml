@@ -4,3 +4,5 @@ version = "0.1.0"
 authors = ["Sgeo <sgeoster@gmail.com>"]
 
 [dependencies]
+memmem = "0.1.1"
+byteorder = "1.2.1"
