@@ -11,7 +11,6 @@ fn main() {
     let mut find: String = String::new();
     io::stdin().read_line(&mut find).expect("Unable to read line!");
     let find = find.trim_right();
-    println!("Looking for {:?}", find);
     println!("What are you replacing it with?: ");
     let mut replace: String = String::new();
     io::stdin().read_line(&mut replace);
@@ -31,10 +30,8 @@ fn main() {
         let mut cur_slice: &[u8] = &in_data;
         let mut cur_index: usize = 0;
         while let Some(sub_index) = searcher.search_in(&cur_slice) {
-            println!("Looking at subindex {}", sub_index);
             cur_index += sub_index;
             let (before, middle_after) = cur_slice.split_at(sub_index - 2);
-            println!("middle_after.split_at(2) = {:?}", middle_after.split_at(2).0);
             let cur_size = BigEndian::read_u16(middle_after);
             let new_size = ((cur_size as isize) + change) as u16;
             let mut new_size_buffer: [u8; 2] = [0; 2];
