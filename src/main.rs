@@ -13,7 +13,7 @@ fn main() {
     let find = find.trim_right();
     println!("What are you replacing it with?: ");
     let mut replace: String = String::new();
-    io::stdin().read_line(&mut replace);
+    io::stdin().read_line(&mut replace).expect("Unable to read line!");
     let replace = replace.trim_right();
     
     let change: isize = (replace.as_bytes().len() as isize) - (find.as_bytes().len() as isize);
