@@ -7,20 +7,21 @@ use memmem::{Searcher, TwoWaySearcher};
 use byteorder::{BigEndian, ByteOrder};
 
 fn main() {
-    print!("What are you searching for?: ");
+    println!("What are you searching for?: ");
     let mut find: String = String::new();
     io::stdin().read_line(&mut find).expect("Unable to read line!");
-    find.pop(); // Eliminate newline
-    print!("What are you replacing it with?: ");
+    let find = find.trim_right();
+    println!("Looking for {:?}", find);
+    println!("What are you replacing it with?: ");
     let mut replace: String = String::new();
     io::stdin().read_line(&mut replace);
-    replace.pop();
+    let replace = replace.trim_right();
     
     let change: isize = (replace.as_bytes().len() as isize) - (find.as_bytes().len() as isize);
     
     let searcher = TwoWaySearcher::new(find.as_bytes());
     
-    for filename in std::env::args() {
+    for filename in std::env::args().skip(1) {
         let mut in_data: Vec<u8> = Vec::new();
         let mut out_data: Vec<u8> = Vec::new();
         {
@@ -29,14 +30,17 @@ fn main() {
         }
         let mut cur_slice: &[u8] = &in_data;
         let mut cur_index: usize = 0;
-        while let Some(sub_index) = searcher.search_in(&in_data) {
+        while let Some(sub_index) = searcher.search_in(&cur_slice) {
+            println!("Looking at subindex {}", sub_index);
             cur_index += sub_index;
             let (before, middle_after) = cur_slice.split_at(sub_index - 2);
+            println!("middle_after.split_at(2) = {:?}", middle_after.split_at(2).0);
             let cur_size = BigEndian::read_u16(middle_after);
             let new_size = ((cur_size as isize) + change) as u16;
             let mut new_size_buffer: [u8; 2] = [0; 2];
             BigEndian::write_u16(&mut new_size_buffer, new_size);
-            cur_slice = middle_after.split_at((cur_size as usize) + 2).1;
+            let (middle, after) = middle_after.split_at(find.as_bytes().len() + 2);
+            cur_slice = after;
             
             out_data.extend_from_slice(before);
             out_data.extend_from_slice(&new_size_buffer);
